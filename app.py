@@ -17,21 +17,21 @@ app.secret_key = "your_secret_key_here"
 # ======================
 # FIREBASE ADMIN INIT
 # ======================
-# 1️⃣ Get base64 string from environment
+# Get base64 string from environment
 firebase_b64 = os.environ.get("FIREBASE_SERVICE_ACCOUNT_BASE64")
 
-# 2️⃣ Decode base64 into bytes
-firebase_bytes = base64.b64decode(firebase_b64)
+# Decode base64 safely into string
+firebase_json_str = base64.b64decode(firebase_b64).decode("utf-8-sig")  # ⚡ notice utf-8-sig
 
-# 3️⃣ Convert bytes directly to JSON dict
-firebase_cred_dict = json.loads(firebase_bytes)
+# Load as dictionary
+firebase_cred_dict = json.loads(firebase_json_str)
 
-# 4️⃣ Initialize Firebase Admin
+# Initialize Firebase
 cred = credentials.Certificate(firebase_cred_dict)
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
 
-# 5️⃣ Firestore client
+# Firestore client
 db = firestore.client()
 # ======================
 # LOGIN ROUTE (SECURE)
@@ -249,6 +249,7 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
