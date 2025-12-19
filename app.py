@@ -17,20 +17,20 @@ app.secret_key = "your_secret_key_here"
 # ======================
 # FIREBASE ADMIN INIT
 # ======================
-firebase_b64 = os.environ.get("FIREBASE_SERVICE_ACCOUNT_BASE64")
+firebase_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
 
-# Fix padding (if needed)
-missing_padding = len(firebase_b64) % 4
-if missing_padding:
-    firebase_b64 += "=" * (4 - missing_padding)
+if not firebase_json:
+    raise ValueError("FIREBASE_SERVICE_ACCOUNT_JSON is not set")
 
-service_account_info = json.loads(base64.b64decode(firebase_b64).decode("utf-8"))
+service_account_info = json.loads(firebase_json)
 
 cred = credentials.Certificate(service_account_info)
+
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
+
 # ======================
 # LOGIN ROUTE (SECURE)
 # ======================
@@ -247,6 +247,7 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
