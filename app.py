@@ -18,10 +18,6 @@ app.secret_key = "your_secret_key_here"
 # FIREBASE ADMIN INIT
 # ======================
 service_account_info = json.loads(
-    os.environ.get("FIREBASE_SERVICE_ACCOUNT")
-)
-
-service_account_info = json.loads(
     base64.b64decode(os.environ.get("FIREBASE_SERVICE_ACCOUNT_BASE64")).decode("utf-8")
 )
 
@@ -246,5 +242,6 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
