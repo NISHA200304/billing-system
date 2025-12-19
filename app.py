@@ -5,6 +5,7 @@ import uuid
 import requests
 import json
 import os
+import base64
 from config import FIREBASE_WEB_API_KEY  # 🔑 IMPORTANT
 
 # ======================
@@ -20,10 +21,13 @@ service_account_info = json.loads(
     os.environ.get("FIREBASE_SERVICE_ACCOUNT")
 )
 
+service_account_info = json.loads(
+    base64.b64decode(os.environ.get("FIREBASE_SERVICE_ACCOUNT_BASE64")).decode("utf-8")
+)
+
 cred = credentials.Certificate(service_account_info)
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
-
 
 db = firestore.client()
 # ======================
@@ -242,4 +246,5 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+
 
