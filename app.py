@@ -5,7 +5,8 @@ import uuid
 import requests
 from config import FIREBASE_WEB_API_KEY
 import base64
-import json # 🔑 IMPORTANT
+import json
+import os # 🔑 IMPORTANT
 
 # ======================
 # FLASK INIT
@@ -238,4 +239,5 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+
 
