@@ -22,6 +22,7 @@ firebase_key_json = base64.b64decode(firebase_key_base64).decode("utf-8")
 
 cred = credentials.Certificate(json.loads(firebase_key_json))
 firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 # ======================
 # LOGIN ROUTE (SECURE)
@@ -239,5 +240,6 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
