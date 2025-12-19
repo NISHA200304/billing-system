@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Management - Hospital Billing</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+  <style>
+    #wrapper.toggled #sidebar-wrapper { margin-left: -250px; }
+    #sidebar-wrapper { width: 250px; transition: margin 0.3s; }
+    .card { height: 100%; }
+    #sidebarToggle { margin-left: 15px; }
+    .table-wrapper { max-height: 400px; overflow-y: auto; }
+    .back-btn { margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+<div class="d-flex" id="wrapper">
+
+  <!-- Sidebar -->
+  <div class="border-end bg-light" id="sidebar-wrapper">
+    <div class="sidebar-heading text-center py-4 fs-4 fw-bold text-primary">
+      Hospital Admin
+    </div>
+    <div class="list-group list-group-flush">
+      <a href="{{ url_for('staff_management') }}" class="list-group-item list-group-item-action p-3">
+        <i class="bi bi-people-fill me-2"></i> Staff Management
+      </a>
+      <a href="{{ url_for('patient_management') }}" class="list-group-item list-group-item-action p-3">
+        <i class="bi bi-person-lines-fill me-2"></i> Patient Management
+      </a>
+      <a href="{{ url_for('billing_structure') }}" class="list-group-item list-group-item-action p-3">
+        <i class="bi bi-receipt-cutoff me-2"></i> Billing Structure
+      </a>
+      <a href="{{ url_for('logout') }}" class="list-group-item list-group-item-action p-3">
+        <i class="bi bi-box-arrow-right me-2"></i> Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div id="page-content-wrapper" class="w-100">
+    <nav class="navbar navbar-light bg-light border-bottom">
+      <div class="container-fluid position-relative">
+        <button class="btn btn-primary position-absolute start-0" id="sidebarToggle">
+          <i class="bi bi-list"></i>
+        </button>
+        <span class="fs-4 fw-semibold text-center w-100 d-block">Patient Management</span>
+      </div>
+    </nav>
+
+    <div class="container-fluid px-4 mt-4">
+      <!-- Back Button -->
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary back-btn">
+        <i class="bi bi-arrow-left me-2"></i> Back to Dashboard
+      </a>
+
+      <!-- Add Patient Form -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-success text-white">Add New Patient</div>
+        <div class="card-body">
+          <form id="addPatientForm">
+            <div class="row g-3">
+              <div class="col-md-3"><input type="text" class="form-control" placeholder="Full Name" required></div>
+              <div class="col-md-2"><input type="number" class="form-control" placeholder="Age" required></div>
+              <div class="col-md-2">
+                <select class="form-select" required>
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="col-md-3"><input type="text" class="form-control" placeholder="Treatment / Condition" required></div>
+              <div class="col-md-2"><input type="text" class="form-control" placeholder="Room Type" required></div>
+            </div>
+            <div class="mt-3 text-end">
+              <button type="submit" class="btn btn-success">Add Patient</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Patient Table -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+          <span>All Patients</span>
+          <input type="text" class="form-control w-25" id="patientFilter" placeholder="Filter by name">
+        </div>
+        <div class="card-body table-wrapper">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Treatment</th>
+                <th>Room Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="patientTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update Patient Modal -->
+<div class="modal fade" id="updatePatientModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Update Patient</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="updatePatientForm">
+          <input type="hidden" id="updatePatientId">
+          <div class="mb-3"><input type="text" class="form-control" id="updatePatientName" placeholder="Full Name" required></div>
+          <div class="mb-3"><input type="number" class="form-control" id="updatePatientAge" placeholder="Age" required></div>
+          <div class="mb-3">
+            <select class="form-select" id="updatePatientGender" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="mb-3"><input type="text" class="form-control" id="updatePatientTreatment" placeholder="Treatment / Condition" required></div>
+          <div class="mb-3"><input type="text" class="form-control" id="updatePatientRoom" placeholder="Room Type" required></div>
+          <button type="submit" class="btn btn-success w-100">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const patientTable = document.getElementById("patientTable");
+
+    // Fetch patients
+    const fetchPatients = () => {
+        fetch("/patient/get_all")
+        .then(res => res.json())
+        .then(data => {
+            patientTable.innerHTML = "";
+            data.forEach((patient,index) => {
+                patientTable.innerHTML += `
+                <tr data-id="${patient.id}">
+                    <td>${index+1}</td>
+                    <td>${patient.name}</td>
+                    <td>${patient.age}</td>
+                    <td>${patient.gender}</td>
+                    <td>${patient.treatment}</td>
+                    <td>${patient.room}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary me-1 updateBtn">Update</button>
+                        <button class="btn btn-sm btn-danger deleteBtn">Delete</button>
+                    </td>
+                </tr>`;
+            });
+        });
+    };
+    fetchPatients();
+
+    // Add patient
+    document.getElementById("addPatientForm").addEventListener("submit", e=>{
+        e.preventDefault();
+        const form = e.target;
+        const name = form[0].value;
+        const age = form[1].value;
+        const gender = form[2].value;
+        const treatment = form[3].value;
+        const room = form[4].value;
+
+        fetch("/patient/add", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({name,age,gender,treatment,room})
+        }).then(()=>{
+            form.reset();
+            fetchPatients();
+        });
+    });
+
+    // Delete patient
+    patientTable.addEventListener("click", e=>{
+        if(e.target.classList.contains("deleteBtn")){
+            const id = e.target.closest("tr").dataset.id;
+            if(confirm("Delete this patient?")){
+                fetch(`/patient/delete/${id}`,{method:"DELETE"}).then(fetchPatients);
+            }
+        }
+    });
+
+    // Open update modal
+    patientTable.addEventListener("click", e=>{
+        if(e.target.classList.contains("updateBtn")){
+            const tr = e.target.closest("tr");
+            document.getElementById("updatePatientId").value = tr.dataset.id;
+            document.getElementById("updatePatientName").value = tr.cells[1].textContent;
+            document.getElementById("updatePatientAge").value = tr.cells[2].textContent;
+            document.getElementById("updatePatientGender").value = tr.cells[3].textContent;
+            document.getElementById("updatePatientTreatment").value = tr.cells[4].textContent;
+            document.getElementById("updatePatientRoom").value = tr.cells[5].textContent;
+            new bootstrap.Modal(document.getElementById("updatePatientModal")).show();
+        }
+    });
+
+    // Submit update
+    document.getElementById("updatePatientForm").addEventListener("submit", e=>{
+        e.preventDefault();
+        const id = document.getElementById("updatePatientId").value;
+        const name = document.getElementById("updatePatientName").value;
+        const age = document.getElementById("updatePatientAge").value;
+        const gender = document.getElementById("updatePatientGender").value;
+        const treatment = document.getElementById("updatePatientTreatment").value;
+        const room = document.getElementById("updatePatientRoom").value;
+
+        fetch(`/patient/update/${id}`, {
+            method: "PUT",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({name,age,gender,treatment,room})
+        }).then(()=>{
+            fetchPatients();
+            bootstrap.Modal.getInstance(document.getElementById("updatePatientModal")).hide();
+        });
+    });
+
+    // Filter
+    const patientFilter = document.getElementById("patientFilter");
+    patientFilter.addEventListener("keyup", ()=>{
+        const filter = patientFilter.value.toLowerCase();
+        document.querySelectorAll("#patientTable tr").forEach(row=>{
+            const name = row.cells[1].textContent.toLowerCase();
+            row.style.display = name.includes(filter) ? '' : 'none';
+        });
+    });
+
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const wrapper = document.getElementById('wrapper');
+    sidebarToggle.addEventListener('click', ()=>{ wrapper.classList.toggle('toggled'); });
+});
+</script>
+</body>
+</html>
