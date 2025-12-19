@@ -3,7 +3,9 @@ import firebase_admin # pyright: ignore[reportMissingImports]
 from firebase_admin import credentials, firestore # pyright: ignore[reportMissingImports]
 import uuid
 import requests
-from config import FIREBASE_WEB_API_KEY  # 🔑 IMPORTANT
+from config import FIREBASE_WEB_API_KEY
+import base64
+import json # 🔑 IMPORTANT
 
 # ======================
 # FLASK INIT
@@ -14,9 +16,11 @@ app.secret_key = "your_secret_key_here"
 # ======================
 # FIREBASE ADMIN INIT
 # ======================
-cred = credentials.Certificate("serviceAccountKey.json")
+firebase_key_base64 = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
+firebase_key_json = base64.b64decode(firebase_key_base64).decode("utf-8")
+
+cred = credentials.Certificate(json.loads(firebase_key_json))
 firebase_admin.initialize_app(cred)
-db = firestore.client()
 
 # ======================
 # LOGIN ROUTE (SECURE)
@@ -234,3 +238,4 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+
