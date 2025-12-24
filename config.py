@@ -1,1 +1,2 @@
-FIREBASE_WEB_API_KEY = "AIzaSyCWrWWNc9Xh3wN0xnLyWSiaiBRulsUHV7I"
+FIREBASE_WEB_API_KEY = "my_example_api"
+
