@@ -28,7 +28,7 @@ How to Run Locally :
 2. Install dependencies:
    pip install -r requirements.txt
    
-3. Copy config.example.py and rename it to config.py and replace the actual     firebase api key from the firebase consoe
+3. Copy config.example.py and rename it to config.py and replace the actual firebase api key from the firebase console
   
 4. Add your Firebase Web API key in config.py
 
